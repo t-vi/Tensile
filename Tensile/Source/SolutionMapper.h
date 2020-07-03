@@ -111,10 +111,24 @@ public:
             hipGetDeviceProperties(&deviceProperties, i);
             std::string deviceName(deviceProperties.name);
 
+            std::string shortDeviceName;
+            auto pos = deviceName.find('[');
+            if ((pos != std::string::npos) && (pos > 0)) {
+                std::string whitespaces (" \t\f\v\n\r");
+                std::size_t found = deviceName.find_last_not_of(whitespaces, pos - 1);
+                shortDeviceName = deviceName.substr(0, found + 1);
+            }
+
             if((deviceName == mapperName))
             {
                 matches++;
                 _mapper[i] = mapper;
+            }
+
+            if((_mapper[i] == nullptr) && (shortDeviceName == mapperName))
+            {
+                _mapper[i] = mapper;
+                matches++;
             }
 
             if((mapperName == "fallback" || mapperName == "Device 0000"))
